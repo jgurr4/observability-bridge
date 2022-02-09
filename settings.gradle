@@ -8,5 +8,4 @@
  */
 
 rootProject.name = 'observability-bridge'
-include 'immutable-collections/lib'
-include 'lib' 
+includeBuild '../immutable-collections'

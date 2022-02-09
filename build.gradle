@@ -11,12 +11,17 @@ plugins {
     id 'java-library'
 }
 
+group 'org.ple'
+version '0.1'
+
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 dependencies {
+    implementation 'org.ple:immutable-collections'
+
     // Use JUnit test framework.
     testImplementation 'junit:junit:4.13.2'
 
