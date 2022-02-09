@@ -1,3 +1,0 @@
-[submodule "immutable-collections"]
-	path = immutable-collections
-	url = https://github.com/jeremygurr/immutable-collections.git
