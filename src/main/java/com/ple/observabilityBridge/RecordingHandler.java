@@ -6,6 +6,10 @@ import com.ple.util.Immutable;
 @Immutable
 public interface RecordingHandler {
 
-  void open(RecordingService recordingService, String context, IMap<String, String> lowCard, IMap<String, String> highCard);
+  RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions);
+
+  RecordingHandler close(RecordingService recordingService, String context, IMap<String, String> dimensions);
+
+  RecordingHandler log(RecordingService recordingService, int level, String base, IMap<String, String> dimensions);
 
 }
