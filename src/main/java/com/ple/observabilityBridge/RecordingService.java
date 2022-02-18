@@ -6,7 +6,9 @@ package com.ple.observabilityBridge;
 import com.ple.util.IArrayMap;
 import com.ple.util.IMap;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -15,20 +17,20 @@ import java.util.List;
 public class RecordingService {
 
   public final List<RecordingHandler> handlers;
-  public final List<String> contextList;
-  public final List<Long> startTimeList;
+  public final Deque<String> contextList;
+  public final Deque<Long> startTimeList;
 
-  private RecordingService(List<RecordingHandler> handlers, List<String> contextList, List<Long> startTimeList) {
+  private RecordingService(List<RecordingHandler> handlers, Deque<String> contextList, Deque<Long> startTimeList) {
     this.handlers = handlers;
     this.contextList = contextList;
     this.startTimeList = startTimeList;
   }
 
   public static RecordingService make(RecordingHandler... handlers) {
-    return new RecordingService(List.of(handlers), new ArrayList<>(), new ArrayList<>());
+    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>());
   }
 
-  public RecordingService open(String context, IMap<String, String> dimensions) {
+  public RecordingService open(String context, IMap<String, Object> dimensions) {
     startTimeList.add(System.currentTimeMillis());
     contextList.add(context);
 
@@ -39,28 +41,36 @@ public class RecordingService {
     return this;
   }
 
-  public RecordingService open(String context) {
-    return open(context, null);
+  public RecordingService open(String context, Object... dimensions) {
+    return open(context, IArrayMap.make(dimensions));
   }
 
-  public RecordingService close(String context, IMap<String, String> dimensions) {
+  public RecordingService open(String context) {
+    return open(context);
+  }
+
+  public RecordingService close(String context, IMap<String, Object> dimensions) {
     for (RecordingHandler handler : handlers) {
       handler.close(this, context, dimensions);
     }
-    startTimeList.remove(startTimeList.size() - 1);
-    contextList.remove(contextList.size() - 1);
+    startTimeList.removeLast();
+    contextList.removeLast();
     return this;
   }
 
+  public RecordingService close(String context, Object... dimensions) {
+    return close(context, IArrayMap.make(dimensions));
+  }
+
   public RecordingService close(String context) {
-    return close(context, null);
+    return close(context, IArrayMap.empty);
   }
 
   public RecordingService clone() {
-    return new RecordingService(new ArrayList(handlers), new ArrayList(contextList), new ArrayList(startTimeList));
+    return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList));
   }
 
-  public RecordingService log(int level, String base, IMap<String, String> dimensions) {
+  public RecordingService log(int level, String base, IMap<String, Object> dimensions) {
     for (RecordingHandler handler : handlers) {
       handler.log(this, level, base, dimensions);
     }
@@ -68,11 +78,11 @@ public class RecordingService {
   }
 
   public RecordingService log(int level, String base, Object... dimensions) {
-    return log(level, base, IArrayMap.make(dimensions);
+    return log(level, base, IArrayMap.make(dimensions));
   }
 
   public RecordingService log(String base, Object... dimensions) {
-    return log(0, base, IArrayMap.make(dimensions);
+    return log(0, base, IArrayMap.make(dimensions));
   }
 
 }
