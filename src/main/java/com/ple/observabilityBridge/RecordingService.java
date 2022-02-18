@@ -6,10 +6,7 @@ package com.ple.observabilityBridge;
 import com.ple.util.IArrayMap;
 import com.ple.util.IMap;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 /**
  * Should only be used by a single thread. If it is needed in another thread, pass a cloned instance.
@@ -53,6 +50,10 @@ public class RecordingService {
 
     for (RecordingHandler handler : handlers) {
       handler.close(this, context, dimensions);
+    }
+
+    if (!Objects.equals(contextList.getLast(), context)) {
+      System.err.println("Warning: logging close mismatch, expected [" + contextList.getLast() + "] but got [" + context + "]");
     }
 
     startTimeList.removeLast();
