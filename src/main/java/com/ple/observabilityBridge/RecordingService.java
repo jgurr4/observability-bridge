@@ -16,15 +16,17 @@ public class RecordingService {
   public final List<RecordingHandler> handlers;
   public final Deque<String> contextList;
   public final Deque<Long> startTimeList;
+  public int verbosity = 0;
 
-  private RecordingService(List<RecordingHandler> handlers, Deque<String> contextList, Deque<Long> startTimeList) {
+  private RecordingService(List<RecordingHandler> handlers, Deque<String> contextList, Deque<Long> startTimeList, int verbosity) {
     this.handlers = handlers;
     this.contextList = contextList;
     this.startTimeList = startTimeList;
+    this.verbosity = verbosity;
   }
 
   public static RecordingService make(RecordingHandler... handlers) {
-    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>());
+    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>(), 0);
   }
 
   public RecordingService open(String context, IMap<String, Object> dimensions) {
@@ -72,7 +74,7 @@ public class RecordingService {
   }
 
   public RecordingService clone() {
-    return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList));
+    return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList), verbosity);
   }
 
   public RecordingService log(int importance, String base, IMap<String, Object> dimensions) {

@@ -28,17 +28,22 @@ public class SystemOutLogHandler implements RecordingHandler {
   public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base, IMap<String, Object> dimensions) {
 
     int baseLevel = recordingService.contextList.size();
-    int computedLevel = baseLevel + importance;
-    String message = base + " " + dimensions.toKVString();
+    int computedLevel = baseLevel - importance;
 
-    if (indent) {
-      message = " ".repeat(baseLevel + indentOffset) + message;
-    }
+    if (computedLevel < recordingService.verbosity) {
 
-    if (computedLevel < 0) {
-      System.err.println(message);
-    } else {
-      System.out.println(message);
+      String message = base + " " + dimensions.toKVString();
+
+      if (indent) {
+        message = " ".repeat(baseLevel + indentOffset) + message;
+      }
+
+      if (computedLevel < 0) {
+        System.err.println(message);
+      } else {
+        System.out.println(message);
+      }
+
     }
 
     return this;
