@@ -46,7 +46,7 @@ public class RecordingService {
   }
 
   public RecordingService open(String context) {
-    return open(context);
+    return open(context, IArrayMap.empty);
   }
 
   public RecordingService close(String context, IMap<String, Object> dimensions) {
