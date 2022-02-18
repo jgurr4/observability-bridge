@@ -50,12 +50,16 @@ public class RecordingService {
   }
 
   public RecordingService close(String context, IMap<String, Object> dimensions) {
+
     for (RecordingHandler handler : handlers) {
       handler.close(this, context, dimensions);
     }
+
     startTimeList.removeLast();
     contextList.removeLast();
+
     return this;
+
   }
 
   public RecordingService close(String context, Object... dimensions) {
@@ -70,15 +74,15 @@ public class RecordingService {
     return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList));
   }
 
-  public RecordingService log(int level, String base, IMap<String, Object> dimensions) {
+  public RecordingService log(int importance, String base, IMap<String, Object> dimensions) {
     for (RecordingHandler handler : handlers) {
-      handler.log(this, level, base, dimensions);
+      handler.log(this, 0, importance, base, dimensions);
     }
     return this;
   }
 
-  public RecordingService log(int level, String base, Object... dimensions) {
-    return log(level, base, IArrayMap.make(dimensions));
+  public RecordingService log(int importance, String base, Object... dimensions) {
+    return log(importance, base, IArrayMap.make(dimensions));
   }
 
   public RecordingService log(String base, Object... dimensions) {
