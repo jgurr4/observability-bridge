@@ -13,6 +13,12 @@ import java.util.*;
  */
 public class RecordingService {
 
+  public static final RecordingService empty = make();
+
+  public static RecordingService make(RecordingHandler... handlers) {
+    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>(), 0);
+  }
+
   public final List<RecordingHandler> handlers;
   public final Deque<String> contextList;
   public final Deque<Long> startTimeList;
@@ -23,10 +29,6 @@ public class RecordingService {
     this.contextList = contextList;
     this.startTimeList = startTimeList;
     this.verbosity = verbosity;
-  }
-
-  public static RecordingService make(RecordingHandler... handlers) {
-    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>(), 0);
   }
 
   public RecordingService open(String context, IMap<String, Object> dimensions) {
