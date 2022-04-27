@@ -12,20 +12,20 @@ public class SystemOutLogHandler implements RecordingHandler {
   public boolean indent = true;
 
   @Override
-  public RecordingHandler open(RecordingService recordingService, String context, IMap<String, Object> dimensions) {
+  public RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions) {
     return log(recordingService, -1, 0, "Opening: " + context, dimensions);
   }
 
   @Override
-  public RecordingHandler close(RecordingService recordingService, String context, IMap<String, Object> dimensions) {
+  public RecordingHandler close(RecordingService recordingService, String context, IMap<String, String> dimensions) {
     Long startTime = recordingService.startTimeList.getLast();
     long duration = System.currentTimeMillis() - startTime;
-    dimensions = dimensions.put("duration_ms", duration);
+    dimensions = dimensions.put("duration_ms", Long.toString(duration));
     return log(recordingService, -1, 0, "Closing: " + context, dimensions);
   }
 
   @Override
-  public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base, IMap<String, Object> dimensions) {
+  public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base, IMap<String, String> dimensions) {
 
     int baseLevel = recordingService.contextList.size();
     int computedLevel = baseLevel - importance;

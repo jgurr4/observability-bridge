@@ -31,7 +31,7 @@ public class RecordingService {
     this.verbosity = verbosity;
   }
 
-  public RecordingService open(String context, IMap<String, Object> dimensions) {
+  public RecordingService open(String context, IMap<String, String> dimensions) {
     startTimeList.add(System.currentTimeMillis());
     contextList.add(context);
 
@@ -50,7 +50,7 @@ public class RecordingService {
     return open(context, IArrayMap.empty);
   }
 
-  public RecordingService close(String context, IMap<String, Object> dimensions) {
+  public RecordingService close(String context, IMap<String, String> dimensions) {
 
     for (RecordingHandler handler : handlers) {
       handler.close(this, context, dimensions);
@@ -79,7 +79,7 @@ public class RecordingService {
     return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList), verbosity);
   }
 
-  public RecordingService log(int importance, String base, IMap<String, Object> dimensions) {
+  public RecordingService log(int importance, String base, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers) {
       handler.log(this, 0, importance, base, dimensions);
     }
