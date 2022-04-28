@@ -86,11 +86,11 @@ public class RecordingService {
     return this;
   }
 
-  public RecordingService log(int importance, String base, Object... dimensions) {
+  public RecordingService log(int importance, String base, String... dimensions) {
     return log(importance, base, IArrayMap.make(dimensions));
   }
 
-  public RecordingService log(String base, Object... dimensions) {
+  public RecordingService log(String base, String... dimensions) {
     return log(0, base, IArrayMap.make(dimensions));
   }
 

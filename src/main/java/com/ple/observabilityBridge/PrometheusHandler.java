@@ -1,5 +1,7 @@
 package com.ple.observabilityBridge;
 
+import com.ple.util.IEntry;
+import com.ple.util.IList;
 import com.ple.util.IMap;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
@@ -7,15 +9,16 @@ import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleCollector;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class PrometheusHandler implements RecordingHandler {
   public static PrometheusHandler only = new PrometheusHandler();
-  public static Map<String, Counter> counters = new HashMap<>();
-  public static Map<String, Gauge> gauges = new HashMap<>();
-  public static Map<String, Histogram> histograms = new HashMap<>();
+  private static Map<String, Counter> counters = new HashMap<>();
+  private static Map<String, Gauge> gauges = new HashMap<>();
+  private static Map<String, Histogram> histograms = new HashMap<>();
 
-  // Open and close are used for histograms to record latency for buckets.
+  // Open and close are used for histograms to record latency for buckets. They may also be used to generate generic category for the metrics inside.
   @Override
   public RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions) {
     return null;
@@ -46,11 +49,14 @@ public class PrometheusHandler implements RecordingHandler {
   // dimension keys go in labelNames() for counter creation. Dimension values go in labels() for incrementing. base is used to define the counter key and the metric name(). help() is always empty
   // Don't bother trying to use exporting or service discovery for prometheus yet. Only worry about that once everything is finished and you are ready to create prometheus service in docker.
   // recordingservice
+  // We need labels from (dimensions) as well as generic tag from (Open) and (close) tag, and finally we have a metric name which is determined by the labels.
+  // If labels are the same it is the same metric.
   @Override
   public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base,
                               IMap<String, String> dimensions) {
-    String metricName = makeMetricFromBase(base);
+/*
     SimpleCollector<?> metricType = determineMetricType(base, dimensions, importance);
+    String metricName = makeMetricFromBase(base, metricType);
     if (metricType instanceof Counter) {
       final Counter counter;
       if (!counters.containsKey(metricName)) {
@@ -72,7 +78,47 @@ public class PrometheusHandler implements RecordingHandler {
     } else if (metricType instanceof Histogram){
       histograms.put(metricName, Histogram.build().name(metricName).labelNames(dimensions.keys().toArray()).register());
     }
+*/
+    String metricName = makeMetricFromBase(base, dimensions);
+    final Counter counter;
+    if (!counters.containsKey(metricName)) {
+      counter = Counter.build().name(metricName).labelNames(dimensions.keys().toArray(new String[0])).help("1").register();
+      counters.put(metricName, counter);
+    } else {
+      counter = counters.get(metricName);
+    }
+    counter.labels(dimensions.values().toArray(new String[0])).inc();
     return this;
+  }
+
+  @Override
+  public Counter get(String metricName) {
+    return counters.get(metricName);
+  }
+
+  private String makeMetricFromBase(String base, IMap<String, String> dimensions) {
+    // Here I will design an algorithm which will remove all spaces from the base metric name, and replace them with underscores (_).
+    // This will also change the name of the metric so it fits into the rules of our names above. For counters it must either end with
+    // _request_count  _return_count
+    // For gauges it must end in _total
+    // And look up more name rules to use here as well. https://prometheus.io/docs/practices/naming/
+    // For now I won't do anything except replace " " with "_"
+    String metricName = base;
+    for (IEntry<String, String> dimension : dimensions) {
+      metricName += "_" + dimension.key;
+    }
+/*
+    base = base.replace(" ", "_").toLowerCase(Locale.ROOT);
+    if (metricType instanceof Counter) {
+      metricName = base + "_count";   //FIXME: I don't know how to make sure _request or _return are determined correctly here without requiring users to specify it explicitely.
+    } else if (metricType instanceof Gauge) {
+      metricName = base + "_total";
+    } else if (metricType instanceof Histogram) {
+      metricName = base + "";  //FIXME: I don't know what to put here yet.
+    }
+     return metricName;
+*/
+    return metricName.replace(" ", "_").toLowerCase(Locale.ROOT) + "_count";
   }
 
   private void updateGauge(Gauge gauge, String[] dimensionValues, String metricName) {
@@ -100,12 +146,4 @@ public class PrometheusHandler implements RecordingHandler {
     return null;
   }
 
-  private String makeMetricFromBase(String base) {
-    // Here I will design an algorithm which will remove all spaces from the base metric name, and replace them with underscores (_).
-    // This will also change the name of the metric so it fits into the rules of our names above. For counters it must either end with
-    // _request_count  _return_count
-    // For gauges it must end in _total
-    // And look up more name rules to use here as well.
-    return null;
-  }
 }

@@ -1,6 +1,7 @@
 package com.ple.observabilityBridge;
 
 import com.ple.util.IMap;
+import io.prometheus.client.Counter;
 
 public class JaegerHandler implements RecordingHandler {
   public static JaegerHandler only = new JaegerHandler();
@@ -18,6 +19,11 @@ public class JaegerHandler implements RecordingHandler {
   @Override
   public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base,
                               IMap<String, String> dimensions) {
+    return null;
+  }
+
+  @Override
+  public Counter get(String metricName) {
     return null;
   }
 }

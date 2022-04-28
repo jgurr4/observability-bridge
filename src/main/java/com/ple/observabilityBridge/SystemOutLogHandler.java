@@ -1,6 +1,7 @@
 package com.ple.observabilityBridge;
 
 import com.ple.util.IMap;
+import io.prometheus.client.Counter;
 
 /**
  * This is not thread-safe on purpose. But it's state should rarely change anyway so it shouldn't be an issue in practice.
@@ -48,6 +49,11 @@ public class SystemOutLogHandler implements RecordingHandler {
 
     return this;
 
+  }
+
+  @Override
+  public Counter get(String metricName) {
+    return null;
   }
 
 }
