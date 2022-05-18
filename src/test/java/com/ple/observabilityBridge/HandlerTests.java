@@ -16,16 +16,48 @@ import org.junit.Assert.*;
 public class HandlerTests {
 
   @Test
-  public void prometheusLogTest() {
+  public void promLogTest() {
     final PrometheusHandler promHandler = PrometheusHandler.only;
     final RecordingService rs = RecordingService.make(promHandler);
     rs.log("mysql", "connection", "3", "user", "Mordhau");
 //    rs.log("mysql", "connection", "4", "user", "Benny");
-    Assert.assertThrows(IllegalArgumentException.class, () -> Counter.build().name("mysql_connection_user_count").labelNames("connection", "user").help("1").register());
+    Assert.assertThrows(IllegalArgumentException.class,
+        () -> Counter.build().name("mysql_connection_user_count").labelNames("connection", "user").help("1")
+            .register());
     final Counter mysql_connection_user_count = rs.handlers.get(0).get("mysql_connection_user_count");
 //    Assert.assertEquals(1, mysql_connection_user_count.get(), 0);   //FIXME: .get() fails because noLabelsChild is null.
     System.out.println(mysql_connection_user_count.collect().get(0).toString());
 //    System.out.println(rs.handlers.get(0).get("mysql_connection_user_count"));   // For some reason prometheus client library is missing a toString() method.
+  }
+
+  @Test
+  public void promScrapeTest() {
+
+  }
+
+  @Test
+  public void jaegerOpenCloseTest() {
+    final JaegerHandler jHandler = JaegerHandler.only;
+    final RecordingService rs = RecordingService.make(jHandler);
+    rs.open("root");
+    someMethod(rs);
+//    rs.log()
+    rs.close("root");
+  }
+
+  private void someMethod(RecordingService rs) {
+    rs.open("someMethod", "verticleName", "blah");
+    try {
+      Thread.sleep(100);
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    rs.close("someMethod", "response code", "200");
+  }
+
+  @Test
+  public void jaegerLogTest() {
+
   }
 
 }

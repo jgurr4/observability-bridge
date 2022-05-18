@@ -31,7 +31,18 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:30.1.1-jre'
 
+    // Prometheus Dependencies:
     implementation 'io.prometheus:simpleclient:0.15.0'
+    implementation 'io.prometheus:simpleclient_httpserver:0.15.0'
+
+    // OpenTelemetry Dependencies: https://search.maven.org/search?q=g:io.opentelemetry
+//    implementation 'io.opentelemetry:opentelemetry-sdk-tracing:0.11.0'
+//    implementation 'io.opentelemetry:opentelemetry-api-trace:0.13.1'
+//    implementation 'io.opentelemetry:opentelemetry-api-common:0.13.1'
+//    implementation 'io.opentelemetry:bom:0.14.0'
+    implementation 'io.opentelemetry:opentelemetry-api:1.13.0'
+    implementation 'io.opentelemetry:opentelemetry-sdk:1.13.0'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp:1.13.0'
 
     //Uncomment when ready to use this.
 //    implementation 'io.prometheus:simpleclient_vertx:0.15.0'

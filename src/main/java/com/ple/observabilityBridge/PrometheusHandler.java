@@ -3,11 +3,13 @@ package com.ple.observabilityBridge;
 import com.ple.util.IEntry;
 import com.ple.util.IList;
 import com.ple.util.IMap;
+import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleCollector;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -88,7 +90,18 @@ public class PrometheusHandler implements RecordingHandler {
       counter = counters.get(metricName);
     }
     counter.labels(dimensions.values().toArray(new String[0])).inc();
+    exposeMetric();
     return this;
+  }
+
+  public void exposeMetric() {
+    try {
+      HTTPServer server = new HTTPServer.Builder()
+          .withPort(8080)
+          .build();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override

@@ -16,15 +16,17 @@ public class RecordingService {
   public static final RecordingService empty = make();
 
   public static RecordingService make(RecordingHandler... handlers) {
-    return new RecordingService(List.of(handlers), new ArrayDeque<>(), new ArrayDeque<>(), 0);
+    return new RecordingService(List.of(handlers), new HashMap<>(), new ArrayDeque<>(), 0);
   }
 
   public final List<RecordingHandler> handlers;
-  public final Deque<String> contextList;
+  public final Map<RecordingHandler, Object> contextList;
   public final Deque<Long> startTimeList;
   public int verbosity = 0;
 
-  private RecordingService(List<RecordingHandler> handlers, Deque<String> contextList, Deque<Long> startTimeList, int verbosity) {
+  private RecordingService(List<RecordingHandler> handlers,
+                           Map<RecordingHandler, Object> contextList,
+                           Deque<Long> startTimeList, int verbosity) {
     this.handlers = handlers;
     this.contextList = contextList;
     this.startTimeList = startTimeList;
@@ -33,9 +35,9 @@ public class RecordingService {
 
   public RecordingService open(String context, IMap<String, String> dimensions) {
     startTimeList.add(System.currentTimeMillis());
-    contextList.add(context);
-
+    // The context can become a span for jaeger, it can be a normal string for LogOutHandler, and it can be a
     for (RecordingHandler handler : handlers) {
+      contextList.put(context, )
       handler.open(this, context, dimensions);
     }
 
