@@ -13,30 +13,31 @@ public class SystemOutLogHandler implements RecordingHandler {
   public boolean indent = true;
 
   @Override
-  public RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions) {
-    return log(recordingService, -1, 0, "Opening: " + context, dimensions);
+  public HandlerContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+    return log(context, -1, dimensions, 0);
   }
 
   @Override
-  public RecordingHandler close(RecordingService recordingService, String context, IMap<String, String> dimensions) {
-    Long startTime = recordingService.startTimeList.getLast();
+  public HandlerContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+    Long startTime = context.startTimeList.getLast();
     long duration = System.currentTimeMillis() - startTime;
     dimensions = dimensions.put("duration_ms", Long.toString(duration));
-    return log(recordingService, -1, 0, "Closing: " + context, dimensions);
+    return log(context, -1, dimensions, 0);
   }
 
   @Override
-  public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base, IMap<String, String> dimensions) {
+  public RecordingHandler log(ObservabilityContext context, String group, IMap<String, String> dimensions,
+                              int importance) {
 
-    int baseLevel = recordingService.contextList.size();
+    int baseLevel = context.contextMap.size();
     int computedLevel = baseLevel - importance;
 
-    if (computedLevel < recordingService.verbosity) {
+    if (computedLevel < context.verbosity) {
 
       String message = base + " " + dimensions.toKVString();
 
       if (indent) {
-        message = " ".repeat(baseLevel + indentOffset) + message;
+        message = " ".repeat(baseLevel + group) + message;
       }
 
       if (computedLevel < 0) {

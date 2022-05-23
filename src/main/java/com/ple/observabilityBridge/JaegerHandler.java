@@ -30,7 +30,7 @@ public class JaegerHandler implements RecordingHandler {
   }
 
   @Override
-  public RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions) {
+  public HandlerContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     Span parentSpan = tracer.spanBuilder("").startSpan();
     Span child = tracer.spanBuilder("child span").setParent(Context.current().with(parentSpan)).startSpan();
 // put the span into the current Context
@@ -43,14 +43,14 @@ public class JaegerHandler implements RecordingHandler {
   }
 
   @Override
-  public RecordingHandler close(RecordingService recordingService, String context, IMap<String, String> dimensions) {
+  public HandlerContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     return null;
   }
 
   //Jaeger will record events to a jaeger server, since it is push based. Prometheus is pull based so it simply records events in memory.
   @Override
-  public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base,
-                              IMap<String, String> dimensions) {
+  public RecordingHandler log(ObservabilityContext context, String group, IMap<String, String> dimensions,
+                              int importance) {
     return this;
   }
 

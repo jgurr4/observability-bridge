@@ -1,7 +1,6 @@
 package com.ple.observabilityBridge;
 
 import com.ple.util.IEntry;
-import com.ple.util.IList;
 import com.ple.util.IMap;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.Counter;
@@ -22,14 +21,14 @@ public class PrometheusHandler implements RecordingHandler {
 
   // Open and close are used for histograms to record latency for buckets. They may also be used to generate generic category for the metrics inside.
   @Override
-  public RecordingHandler open(RecordingService recordingService, String context, IMap<String, String> dimensions) {
+  public HandlerContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     return null;
   }
 
   // Eventually you'll want to record timing for how long things take using these for metrics. But that is not necessary at first.
   // It seems like histograms can make use of Open/Close because they are used to observe latency issues.
   @Override
-  public RecordingHandler close(RecordingService recordingService, String context, IMap<String, String> dimensions) {
+  public HandlerContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     return null;
   }
 
@@ -54,8 +53,8 @@ public class PrometheusHandler implements RecordingHandler {
   // We need labels from (dimensions) as well as generic tag from (Open) and (close) tag, and finally we have a metric name which is determined by the labels.
   // If labels are the same it is the same metric.
   @Override
-  public RecordingHandler log(RecordingService recordingService, int indentOffset, int importance, String base,
-                              IMap<String, String> dimensions) {
+  public RecordingHandler log(ObservabilityContext context, String group, IMap<String, String> dimensions,
+                              int importance) {
 /*
     SimpleCollector<?> metricType = determineMetricType(base, dimensions, importance);
     String metricName = makeMetricFromBase(base, metricType);

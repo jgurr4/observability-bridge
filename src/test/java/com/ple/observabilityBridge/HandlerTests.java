@@ -39,20 +39,32 @@ public class HandlerTests {
   public void jaegerOpenCloseTest() {
     final JaegerHandler jHandler = JaegerHandler.only;
     final RecordingService rs = RecordingService.make(jHandler);
-    rs.open("root");
-    someMethod(rs);
-//    rs.log()
-    rs.close("root");
+    ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
+    try {
+      Thread.sleep(10);
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+    rs.log(context, "something happened");
+    rs.close(context, "root");
+    //TODO: Make a Http request here to jaeger docker instance.
+    https://jaeger-query:16686/api/traces/{trace-id-hex-string}
   }
 
-  private void someMethod(RecordingService rs) {
+  @Test
+  public void jaegerOpenCloseTest2() {
+    final JaegerHandler jHandler = JaegerHandler.only;
+    final RecordingService rs = RecordingService.make(jHandler);
+    ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
     rs.open("someMethod", "verticleName", "blah");
     try {
       Thread.sleep(100);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
+    rs.log("")
     rs.close("someMethod", "response code", "200");
+    rs.close(context, "root");
   }
 
   @Test

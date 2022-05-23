@@ -3,97 +3,72 @@
  */
 package com.ple.observabilityBridge;
 
-import com.ple.util.IArrayMap;
-import com.ple.util.IMap;
-
-import java.util.*;
+import com.ple.util.*;
 
 /**
  * Should only be used by a single thread. If it is needed in another thread, pass a cloned instance.
  */
+@Immutable
 public class RecordingService {
 
   public static final RecordingService empty = make();
+  public final IList<RecordingHandler> handlers;
 
   public static RecordingService make(RecordingHandler... handlers) {
-    return new RecordingService(List.of(handlers), new HashMap<>(), new ArrayDeque<>(), 0);
+    return new RecordingService(IArrayList.make(handlers));
   }
 
-  public final List<RecordingHandler> handlers;
-  public final Map<RecordingHandler, Object> contextList;
-  public final Deque<Long> startTimeList;
-  public int verbosity = 0;
-
-  private RecordingService(List<RecordingHandler> handlers,
-                           Map<RecordingHandler, Object> contextList,
-                           Deque<Long> startTimeList, int verbosity) {
+  private RecordingService(IList<RecordingHandler> handlers) {
     this.handlers = handlers;
-    this.contextList = contextList;
-    this.startTimeList = startTimeList;
-    this.verbosity = verbosity;
   }
 
-  public RecordingService open(String context, IMap<String, String> dimensions) {
-    startTimeList.add(System.currentTimeMillis());
-    // The context can become a span for jaeger, it can be a normal string for LogOutHandler, and it can be a
+  public ObservabilityContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers) {
-      contextList.put(context, )
-      handler.open(this, context, dimensions);
+      final HandlerContext handlerContext = handler.open(context.get(handler), group, dimensions);
+      context = context.put(handler, handlerContext);
     }
-
-    return this;
+    return context;
   }
 
-  public RecordingService open(String context, Object... dimensions) {
-    return open(context, IArrayMap.make(dimensions));
+  public ObservabilityContext open(ObservabilityContext context, String group, Object... dimensions) {
+    return open(context, group, IArrayMap.make(dimensions));
   }
 
-  public RecordingService open(String context) {
-    return open(context, IArrayMap.empty);
+  public ObservabilityContext open(ObservabilityContext context, String group) {
+    return open(context, group, IArrayMap.empty);
   }
 
-  public RecordingService close(String context, IMap<String, String> dimensions) {
-
+  public ObservabilityContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers) {
-      handler.close(this, context, dimensions);
+      final HandlerContext handlerContext = handler.close(context.get(handler), group, dimensions);
+      context = context.put(handler, handlerContext);
     }
-
-    if (!Objects.equals(contextList.getLast(), context)) {
-      System.err.println("Warning: logging close mismatch, expected [" + contextList.getLast() + "] but got [" + context + "]");
-    }
-
-    startTimeList.removeLast();
-    contextList.removeLast();
-
-    return this;
-
+    return context;
   }
 
-  public RecordingService close(String context, Object... dimensions) {
-    return close(context, IArrayMap.make(dimensions));
+  public ObservabilityContext close(ObservabilityContext context, String group, Object... dimensions) {
+    return close(context, group, IArrayMap.make(dimensions));
   }
 
-  public RecordingService close(String context) {
-    return close(context, IArrayMap.empty);
+  public ObservabilityContext close(ObservabilityContext context, String group) {
+    return close(context, group, IArrayMap.empty);
   }
 
-  public RecordingService clone() {
-    return new RecordingService(new ArrayList(handlers), new ArrayDeque<>(contextList), new ArrayDeque<>(startTimeList), verbosity);
-  }
-
-  public RecordingService log(int importance, String base, IMap<String, String> dimensions) {
+  public ObservabilityContext log(ObservabilityContext context, String group, int importance,
+                                  IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers) {
-      handler.log(this, 0, importance, base, dimensions);
+      final HandlerContext handlerContext = handler.log(context.get(handler), group, dimensions, importance);
+      context = context.put(handler, handlerContext);
     }
-    return this;
+    return context;
   }
 
-  public RecordingService log(int importance, String base, String... dimensions) {
-    return log(importance, base, IArrayMap.make(dimensions));
+  public ObservabilityContext log(ObservabilityContext context, String group, int importance, String... dimensions) {
+    return log(context, group, importance, IArrayMap.make(dimensions));
   }
 
-  public RecordingService log(String base, String... dimensions) {
-    return log(0, base, IArrayMap.make(dimensions));
+  public ObservabilityContext log(ObservabilityContext context, String group, String... dimensions) {
+    return log(context, group, 0, IArrayMap.make(dimensions));
   }
 
 }
