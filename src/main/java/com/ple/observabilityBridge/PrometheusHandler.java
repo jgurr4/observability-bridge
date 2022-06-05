@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class PrometheusHandler implements RecordingHandler {
+public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
   public static PrometheusHandler only = new PrometheusHandler();
   private static Map<String, Counter> counters = new HashMap<>();
   private static Map<String, Gauge> gauges = new HashMap<>();
@@ -21,14 +21,14 @@ public class PrometheusHandler implements RecordingHandler {
 
   // Open and close are used for histograms to record latency for buckets. They may also be used to generate generic category for the metrics inside.
   @Override
-  public HandlerContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+  public PrometheusContext open(PrometheusContext context, String group, IMap<String, String> dimensions) {
     return null;
   }
 
   // Eventually you'll want to record timing for how long things take using these for metrics. But that is not necessary at first.
   // It seems like histograms can make use of Open/Close because they are used to observe latency issues.
   @Override
-  public HandlerContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+  public PrometheusContext close(PrometheusContext context, String group, IMap<String, String> dimensions) {
     return null;
   }
 
@@ -53,7 +53,7 @@ public class PrometheusHandler implements RecordingHandler {
   // We need labels from (dimensions) as well as generic tag from (Open) and (close) tag, and finally we have a metric name which is determined by the labels.
   // If labels are the same it is the same metric.
   @Override
-  public RecordingHandler log(ObservabilityContext context, String group, IMap<String, String> dimensions,
+  public PrometheusContext log(PrometheusContext context, String group, IMap<String, String> dimensions,
                               int importance) {
 /*
     SimpleCollector<?> metricType = determineMetricType(base, dimensions, importance);

@@ -19,7 +19,7 @@ public class HandlerTests {
   public void promLogTest() {
     final PrometheusHandler promHandler = PrometheusHandler.only;
     final RecordingService rs = RecordingService.make(promHandler);
-    rs.log("mysql", "connection", "3", "user", "Mordhau");
+    rs.log(ObservabilityContext.empty, "mysql", "connection", "3", "user", "Mordhau");
 //    rs.log("mysql", "connection", "4", "user", "Benny");
     Assert.assertThrows(IllegalArgumentException.class,
         () -> Counter.build().name("mysql_connection_user_count").labelNames("connection", "user").help("1")
@@ -37,7 +37,7 @@ public class HandlerTests {
 
   @Test
   public void jaegerOpenCloseTest() {
-    final JaegerHandler jHandler = JaegerHandler.only;
+    final JaegerHandler jHandler = JaegerHandler.make("http://localhost:14520");
     final RecordingService rs = RecordingService.make(jHandler);
     ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
     try {
@@ -47,23 +47,24 @@ public class HandlerTests {
     }
     rs.log(context, "something happened");
     rs.close(context, "root");
-    //TODO: Make a Http request here to jaeger docker instance.
-    https://jaeger-query:16686/api/traces/{trace-id-hex-string}
+    // TODO: Make a Http request here to jaeger docker instance.
+    // https://jaeger-query:16686/api/traces/{trace-id-hex-string}
   }
 
   @Test
   public void jaegerOpenCloseTest2() {
+    // This method actually tests running a nested open and close inside another open and close, simulating real tracing.
     final JaegerHandler jHandler = JaegerHandler.only;
     final RecordingService rs = RecordingService.make(jHandler);
     ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
-    rs.open("someMethod", "verticleName", "blah");
+    context = rs.open(context, "mysqlMethod", "verticleName", "blah");
     try {
-      Thread.sleep(100);
+      Thread.sleep(10);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    rs.log("")
-    rs.close("someMethod", "response code", "200");
+    context = rs.log(context, "mysqlMethod", "connection", "3", "user", "Mordhau");
+    context = rs.close(context, "mysqlMethod", "response code", "200");
     rs.close(context, "root");
   }
 

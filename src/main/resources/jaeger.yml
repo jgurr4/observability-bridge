@@ -1,0 +1,47 @@
+exporters:
+  # Data sources: traces, metrics, logs
+  file:
+    path: ./filename.json
+
+  # Data sources: traces
+  jaeger:
+    endpoint: "jaeger-all-in-one:14250"
+    tls:
+      cert_file: cert.pem
+      key_file: cert-key.pem
+
+  # Data sources: traces
+  kafka:
+    protocol_version: 2.0.0
+
+  # Data sources: traces, metrics, logs
+  logging:
+    loglevel: debug
+
+  # Data sources: traces, metrics
+  opencensus:
+    endpoint: "otelcol2:55678"
+
+  # Data sources: traces, metrics, logs
+  otlp:
+    endpoint: otelcol2:4317
+    tls:
+      cert_file: cert.pem
+      key_file: cert-key.pem
+
+  # Data sources: traces, metrics
+  otlphttp:
+    endpoint: https://example.com:4318/v1/traces
+
+  # Data sources: metrics
+  prometheus:
+    endpoint: "prometheus:8889"
+    namespace: "default"
+
+  # Data sources: metrics
+  prometheusremotewrite:
+    endpoint: "http://some.url:9411/api/prom/push"
+
+  # Data sources: traces
+  zipkin:
+    endpoint: "http://localhost:9411/api/v2/spans"

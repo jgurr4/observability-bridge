@@ -7,18 +7,18 @@ import io.prometheus.client.Counter;
  * This is not thread-safe on purpose. But it's state should rarely change anyway so it shouldn't be an issue in practice.
  * Wrap with sync methods if needed.
  */
-public class SystemOutLogHandler implements RecordingHandler {
+public class SystemOutLogHandler implements RecordingHandler<SystemOutContext> {
 
   public static SystemOutLogHandler only = new SystemOutLogHandler();
   public boolean indent = true;
 
   @Override
-  public HandlerContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+  public SystemOutContext open(SystemOutContext context, String group, IMap<String, String> dimensions) {
     return log(context, -1, dimensions, 0);
   }
 
   @Override
-  public HandlerContext close(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+  public SystemOutContext close(SystemOutContext context, String group, IMap<String, String> dimensions) {
     Long startTime = context.startTimeList.getLast();
     long duration = System.currentTimeMillis() - startTime;
     dimensions = dimensions.put("duration_ms", Long.toString(duration));
@@ -26,7 +26,7 @@ public class SystemOutLogHandler implements RecordingHandler {
   }
 
   @Override
-  public RecordingHandler log(ObservabilityContext context, String group, IMap<String, String> dimensions,
+  public SystemOutContext log(SystemOutContext context, String group, IMap<String, String> dimensions,
                               int importance) {
 
     int baseLevel = context.contextMap.size();
