@@ -14,21 +14,22 @@ public class SystemOutLogHandler implements RecordingHandler<SystemOutContext> {
 
   @Override
   public SystemOutContext open(SystemOutContext context, String group, IMap<String, String> dimensions) {
-    return log(context, -1, dimensions, 0);
+    return log(context, group, dimensions, 0);
   }
 
   @Override
   public SystemOutContext close(SystemOutContext context, String group, IMap<String, String> dimensions) {
-    Long startTime = context.startTimeList.getLast();
-    long duration = System.currentTimeMillis() - startTime;
-    dimensions = dimensions.put("duration_ms", Long.toString(duration));
-    return log(context, -1, dimensions, 0);
+//    Long startTime = context.startTimeList.getLast();
+//    long duration = System.currentTimeMillis() - startTime;
+//    dimensions = dimensions.put("duration_ms", Long.toString(duration));
+//    return log(context, -1, dimensions, 0);
+    return null;
   }
 
   @Override
   public SystemOutContext log(SystemOutContext context, String group, IMap<String, String> dimensions,
                               int importance) {
-
+/*
     int baseLevel = context.contextMap.size();
     int computedLevel = baseLevel - importance;
 
@@ -49,7 +50,8 @@ public class SystemOutLogHandler implements RecordingHandler<SystemOutContext> {
     }
 
     return this;
-
+*/
+    return null;
   }
 
   @Override

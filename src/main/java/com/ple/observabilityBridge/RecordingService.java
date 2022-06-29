@@ -35,7 +35,7 @@ public class RecordingService {
   }
 
   public ObservabilityContext open(ObservabilityContext context, String group, RecordingHandler handler) {
-    context.put(handler, JaegerContext.make());
+    context.put(handler, JaegerContext.make(null));
     return open(context, group, IArrayMap.empty);
   }
 
