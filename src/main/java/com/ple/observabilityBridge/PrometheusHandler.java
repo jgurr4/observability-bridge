@@ -80,7 +80,7 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
       histograms.put(metricName, Histogram.build().name(metricName).labelNames(dimensions.keys().toArray()).register());
     }
 */
-    String metricName = makeMetricFromBase(base, dimensions);
+    String metricName = makeMetricFromBase(group, dimensions);
     final Counter counter;
     if (!counters.containsKey(metricName)) {
       counter = Counter.build().name(metricName).labelNames(dimensions.keys().toArray(new String[0])).help("1").register();
@@ -90,7 +90,7 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
     }
     counter.labels(dimensions.values().toArray(new String[0])).inc();
     exposeMetric();
-    return this;
+    return context;
   }
 
   public void exposeMetric() {
@@ -133,6 +133,7 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
     return metricName.replace(" ", "_").toLowerCase(Locale.ROOT) + "_count";
   }
 
+  /*
   private void updateGauge(Gauge gauge, String[] dimensionValues, String metricName) {
     // Here I will design an algorithm which looks into the counters list and finds any that closely match the metric name but oppose it.
     // For example: if mysql_pool_connections_request_count is the metricName, then we search for one called mysql_pool_connections_return_count.
@@ -157,5 +158,5 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
     //Here I will design my algorithm for determining if the event relates to a counter, gauge or histogram.
     return null;
   }
-
+   */
 }

@@ -39,7 +39,7 @@ public class HandlerTests {
   public void jaegerOpenCloseTest() {
     final JaegerHandler jHandler = JaegerHandler.make("http://localhost:14520");
     final RecordingService rs = RecordingService.make(jHandler);
-    ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
+    ObservabilityContext context = rs.open(ObservabilityContext.empty, "root", jHandler);
     try {
       Thread.sleep(10);
     } catch (InterruptedException ex) {
