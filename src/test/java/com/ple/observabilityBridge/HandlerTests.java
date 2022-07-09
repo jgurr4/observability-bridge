@@ -16,6 +16,16 @@ import org.junit.Assert.*;
 public class HandlerTests {
 
   @Test
+  public void sysOutTest() {
+    SystemOutLogHandler sysOutHandler = new SystemOutLogHandler();
+    RecordingService rs = RecordingService.make(sysOutHandler);
+    ObservabilityContext context = rs.open(ObservabilityContext.empty, "sysOutTest");
+    context = rs.log(context, "sysOutTest", "Some message");
+    rs.close(context, "sysOutTest");
+    Assert.assertEquals("Some message", context.get(sysOutHandler).handler.group);
+  }
+
+  @Test
   public void promLogTest() {
     final PrometheusHandler promHandler = PrometheusHandler.only;
     final RecordingService rs = RecordingService.make(promHandler);
@@ -57,14 +67,14 @@ public class HandlerTests {
     final JaegerHandler jHandler = JaegerHandler.only;
     final RecordingService rs = RecordingService.make(jHandler);
     ObservabilityContext context = rs.open(ObservabilityContext.empty, "root");
-    context = rs.open(context, "mysqlMethod", "verticleName", "blah");
+    context = rs.open(context, "mysqlMethod", "mysql", "test");
     try {
       Thread.sleep(10);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     }
-    context = rs.log(context, "mysqlMethod", "connection", "3", "user", "Mordhau");
-    context = rs.close(context, "mysqlMethod", "response code", "200");
+    context = rs.log(context, "mysqlMethod", "mysql", "test");
+    context = rs.close(context, "mysqlMethod");
     rs.close(context, "root");
   }
 
