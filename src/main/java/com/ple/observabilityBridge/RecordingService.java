@@ -18,6 +18,10 @@ public class RecordingService {
     return new RecordingService(IArrayList.make(handlers));
   }
 
+  public RecordingService clone() {
+    return new RecordingService(handlers);
+  }
+
   private RecordingService(IList<RecordingHandler> handlers) {
     this.handlers = handlers;
   }
