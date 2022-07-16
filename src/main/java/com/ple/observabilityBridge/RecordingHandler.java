@@ -14,4 +14,7 @@ public interface RecordingHandler<T extends HandlerContext> {
   T log(T context, String group, IMap<String, String> dimensions, int importance);
 
   Counter get(String metricName);
+
+  HandlerContext emptyContext();
+
 }

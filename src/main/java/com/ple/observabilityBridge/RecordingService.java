@@ -28,8 +28,12 @@ public class RecordingService {
 
   public ObservabilityContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers) {
-      final HandlerContext handlerContext = handler.open(context.get(handler), group, dimensions);
-      context = context.put(handler, handlerContext);
+      if (context.map == null || context.map.get(handler) == null) {
+        context = context.put(handler, handler.open(handler.emptyContext(), group, dimensions));
+      } else {
+        final HandlerContext handlerContext = handler.open(context.get(handler), group, dimensions);
+        context = context.put(handler, handlerContext);
+      }
     }
     return context;
   }

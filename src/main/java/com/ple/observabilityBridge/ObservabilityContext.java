@@ -1,5 +1,6 @@
 package com.ple.observabilityBridge;
 
+import com.ple.util.IArrayMap;
 import com.ple.util.IMap;
 import com.ple.util.Immutable;
 
@@ -16,7 +17,11 @@ public class ObservabilityContext {
   }
 
   ObservabilityContext put(RecordingHandler handler, HandlerContext handlerContext) {
-    map.put(handler, handlerContext);
+    if (map == null) {
+      map = IArrayMap.make(handler, handlerContext);
+    } else {
+      map = map.put(handler, handlerContext);
+    }
     return this;
   }
 }

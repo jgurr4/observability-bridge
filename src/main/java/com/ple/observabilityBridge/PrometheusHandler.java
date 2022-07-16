@@ -108,6 +108,11 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
     return counters.get(metricName);
   }
 
+  @Override
+  public HandlerContext emptyContext() {
+    return new PrometheusContext();
+  }
+
   private String makeMetricFromBase(String base, IMap<String, String> dimensions) {
     // Here I will design an algorithm which will remove all spaces from the base metric name, and replace them with underscores (_).
     // This will also change the name of the metric so it fits into the rules of our names above. For counters it must either end with

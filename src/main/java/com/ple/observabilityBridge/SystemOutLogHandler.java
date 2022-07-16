@@ -59,4 +59,9 @@ public class SystemOutLogHandler implements RecordingHandler<SystemOutContext> {
     return null;
   }
 
+  @Override
+  public HandlerContext emptyContext() {
+    return new SystemOutContext();
+  }
+
 }

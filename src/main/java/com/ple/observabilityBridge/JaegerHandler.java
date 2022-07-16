@@ -4,6 +4,7 @@ import com.ple.util.IMap;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.exporter.otlp.trace.OtlpGrpcSpanExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
@@ -86,6 +87,13 @@ public class JaegerHandler implements RecordingHandler<JaegerContext> {
 
   @Override
   public Counter get(String metricName) {
+    return null;
+  }
+
+  @Override
+  public HandlerContext emptyContext() {
+//    Context context = ;
+//    return new JaegerContext();
     return null;
   }
 }
