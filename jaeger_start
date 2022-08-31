@@ -1,11 +1,13 @@
 #!/bin/bash
 
 docker run --rm -d --name jaeger \
-  -e COLLECTOR_OTLP_ENABLED=true \
   -p 4317:4317 \
   -p 16686:16686 \
-  jaegertracing/all-in-one
+  jaegertracing/all-in-one:1.37
 
+
+#  -e OTEL_TRACES_EXPORTER=jaeger \
+#  -e COLLECTOR_OTLP_ENABLED=true \
 #  -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
 #  -e SPAN_STORAGE_TYPE=cassandra \
 #  -e --config-file=config.yaml \
