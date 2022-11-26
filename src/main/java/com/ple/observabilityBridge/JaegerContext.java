@@ -17,4 +17,12 @@ public class JaegerContext implements HandlerContext {
   public Context get() {
     return context;
   }
+
+  public Context getRoot() {
+    return Context.root();
+  }
+
+  public Context getCurrent() {
+    return Context.current();
+  }
 }

@@ -1,0 +1,28 @@
+clone
+ - Recording service should not be shared across threads. It keeps track of the context which holds events in a that are open, and those events have to be closed. Otherwise if nothing kept track of what was open we cannot know how much time they took to close them.
+ - The parent context has to be different from the children contexts.
+ - Each thread has to have it's own context. Even if it starts from a single thread, as soon as the threads have to split up.
+ - In the context of asynchronous streams you have to make each subscriber clone it's own recording service context to work with.
+
+Metrics:
+ - Cannot have id's or high cardinality
+ - open and close can work to get histograms with duration. If it is a composite event, you want a open and close. Because you have stuff in the middle. But if it is atomic event then you cannot break it up, and it only works from log.
+ - log would be events with increments. 
+
+Tracing:
+ - Tracing can have id's or high cardinality
+ - open create a timestamp
+   Another open inside other opens is just creating another span inside a span.
+   - Every open and close event sends the data to jaeger.
+ - close create another timestamp. 
+ - log says 'something happened'. It is generally not used in tracing, but it can be used in any type of event in case you might need the log line in the trace labels. Sometimes you do need the log line in the trace labels.
+
+Logging:
+ - open will record when something started
+ - close will record when it stopped and how long it took
+ - Log can be just for alerts, it won't be used for traces or metrics
+
+
+Big benefit of Observability Bridge:
+You can develop observability independently of the backend software
+recordingHandlers are made to handle this part depending on what backend software you are using. For example PrometheusHandler, they are independent of application language.
