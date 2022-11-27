@@ -2,9 +2,14 @@ package com.ple.observabilityBridge;
 
 import com.ple.util.IMap;
 import com.ple.util.Immutable;
+import io.opentelemetry.context.Context;
 
+/**
+ * The purpose of ObservabilityContext is...
+ */
 @Immutable
 public class ObservabilityContext {
+  Context
 
   public final static ObservabilityContext empty = new ObservabilityContext();
   public IMap<RecordingHandler, HandlerContext> map;

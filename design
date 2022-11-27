@@ -22,6 +22,17 @@ Logging:
  - close will record when it stopped and how long it took
  - Log can be just for alerts, it won't be used for traces or metrics
 
+Place these definitions inside classes that are not third party:
+ObservabilityContext:
+HandlerContext:
+OpenTelemetry Context:
+OpenTelemetry Tracer:
+OpenTelemetry GlobalTracer:
+
+Adapters: Note, adapters are custom made to connect backend services with observability bridge. Some examples are PrometheusHandler, PrometheusContext, JaegerHandler etc...
+AdapterContext:
+AdapterHandler:
+
 
 Big benefit of Observability Bridge:
 You can develop observability independently of the backend software
