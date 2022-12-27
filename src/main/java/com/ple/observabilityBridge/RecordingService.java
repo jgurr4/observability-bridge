@@ -4,12 +4,20 @@
 package com.ple.observabilityBridge;
 
 import com.ple.util.*;
-import io.opentelemetry.context.Context;
 
 import java.util.Arrays;
 
 /**
+ * RecordingService is the class used to start the process of logging/traces/metrics.
+ * Basically you pass in the custom AdapterContext and RecordingHandler classes into this class based on
+ * your observability needs. Then you should call recordingService.log() methods as needed to perform the
+ * monitoring actions within a particular method.
  * Should only be used by a single thread. If it is needed in another thread, pass a cloned instance.
+ *
+ * To create another instance of RecordingService you must use the clone() method since this object is immutable.
+ *
+ * For now there is only a locally scoped version of RecordingService. However, for automatic scope switching and
+ * certain high-level API operations we may include a Global RecordingService Class.
  */
 @Immutable
 public class RecordingService {
@@ -29,12 +37,12 @@ public class RecordingService {
     return new RecordingService(IHashMap.make(name, handler));
   }
 
-  public ObservabilityContext open(ObservabilityContext context, String group, IMap<String, String> dimensions) {
+  public ObservabilityContext open(ObservabilityContext contextMap, String group, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers.values()) {
-      final HandlerContext handlerContext = handler.open(context.get(handler), group, dimensions);
-      context = context.put(handler, handlerContext);
+      final HandlerContext handlerContext = handler.open(contextMap.get(handler), group, dimensions);
+      contextMap = contextMap.put(handler, handlerContext);
     }
-    return context;
+    return contextMap;
   }
 
   public ObservabilityContext open(ObservabilityContext context, String group, String... dimensions) {

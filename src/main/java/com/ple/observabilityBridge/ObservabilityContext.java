@@ -5,11 +5,10 @@ import com.ple.util.Immutable;
 import io.opentelemetry.context.Context;
 
 /**
- * The purpose of ObservabilityContext is...
+ * This is a map of HandlerContexts. It lets us look up the context for the prometheusHandler or others.
  */
 @Immutable
 public class ObservabilityContext {
-  Context
 
   public final static ObservabilityContext empty = new ObservabilityContext();
   public IMap<RecordingHandler, HandlerContext> map;

@@ -4,6 +4,11 @@ import com.ple.util.IMap;
 import com.ple.util.Immutable;
 import io.prometheus.client.Counter;
 
+/**
+ * RecordingHandler is the parent of all custom AdapterHandler classes which are called by RecordingService whenever
+ * a method is used to open, log or close monitoring for each adapter in the RecordingService.
+ * @param <T>
+ */
 @Immutable
 public interface RecordingHandler<T extends HandlerContext> {
 

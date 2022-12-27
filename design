@@ -4,12 +4,12 @@ clone
  - Each thread has to have it's own context. Even if it starts from a single thread, as soon as the threads have to split up.
  - In the context of asynchronous streams you have to make each subscriber clone it's own recording service context to work with.
 
-Metrics:
+Metrics handlers must implement:
  - Cannot have id's or high cardinality
  - open and close can work to get histograms with duration. If it is a composite event, you want a open and close. Because you have stuff in the middle. But if it is atomic event then you cannot break it up, and it only works from log.
  - log would be events with increments. 
 
-Tracing:
+Tracing handlers must implement:
  - Tracing can have id's or high cardinality
  - open create a timestamp
    Another open inside other opens is just creating another span inside a span.
@@ -17,23 +17,72 @@ Tracing:
  - close create another timestamp. 
  - log says 'something happened'. It is generally not used in tracing, but it can be used in any type of event in case you might need the log line in the trace labels. Sometimes you do need the log line in the trace labels.
 
-Logging:
+Logging handlers must implement:
  - open will record when something started
  - close will record when it stopped and how long it took
  - Log can be just for alerts, it won't be used for traces or metrics
 
 Place these definitions inside classes that are not third party:
-ObservabilityContext:
-HandlerContext:
-OpenTelemetry Context:
-OpenTelemetry Tracer:
-OpenTelemetry GlobalTracer:
 
-Adapters: Note, adapters are custom made to connect backend services with observability bridge. Some examples are PrometheusHandler, PrometheusContext, JaegerHandler etc...
-AdapterContext:
-AdapterHandler:
+ObservabilityContext:
+   ObservabilityContext wraps OpenTelemetry Context inside it, and all interactions with Context happen through Observability Context. In other words, OTEL Context is deeply buried in the Framework it should never be directly interacted with.
+
+HandlerContext:
+   HandlerContext is what is used to
+
+OpenTelemetry Context:
+   Wrapped inside ObservabilityContext. It allows create/use a root context or a local new instance Context as needed.
+
+OpenTelemetry Tracer:
+   Wrapped inside Framework. It allows to create new local traces/spans
+
+OpenTelemetry GlobalTracer:
+   Wrapped inside Framework. It allows access to the global tracer/spans
+
+Handlers: 
+   Handlers are custom made to connect backend services with observability bridge. 
+   They are composed of 2 things: HandlerHandler and HandlerContext for example: PrometheusHandler, PrometheusContext, JaegerHandler, JaegerContext etc...
+
+HandlerContext:
+   HandlerContext is the parent for any custom HandlerContext classes, because there are methods that must be consistent
+   between all HandlerContext classes. The following are some examples of custom HandlerContext classes: JaegerContext,
+   PrometheusContext, SplunkContext.
+   Custom HandlerContext classes will wrap an ObservabilityContext object, and performs operations on it based on the needs of the custom
+   handler itself. I have yet to confirm if things will have to be different between handlers for handling ObservabilityContext. But if so, then we'll keep this class. Otherwise we'll remove it.
+   HandlerContext wraps a ObservabilityContext object, and performs operations on it based on the needs of the custom handler itself. I have yet to confirm if things will have to be different between handlers for handling ObservabilityContext. But if so, then we'll keep this class. Otherwise we'll remove it.
+
+RecordingHandler:
+   RecordingHandler is the parent of all custom HandlerHandler classes which are called by RecordingService whenever
+   a method is used to open, log or close monitoring for each handler in the RecordingService.
+
+RecordingService:
+   RecordingService is the class used to start the process of logging/traces/metrics.
+   Basically you pass in the custom HandlerContext and RecordingHandler classes into this class based on
+   your observability needs. Then you should call recordingService.log() methods as needed to perform the
+   monitoring actions within a particular method.
+   Should only be used by a single thread. If it is needed in another thread, pass a cloned instance.
+   
+   To create another instance of RecordingService you must use the clone() method since this object is immutable.
+   
+   For now there is only a locally scoped version of RecordingService. However, for automatic scope switching and 
+   certain high-level API operations we may include a Global RecordingService Class.
+
+
+Summary:
+  There is a main RecordingService object that is directly used by the user to initiate, log, and close monitoring within a scope.
+  It is instantiated with 0-infinite custom RecordingHandlers based on what services are being connected to in the backend.
+  RecordingService interacts with custom Handlers in order to effectively perform operations based on the different services being connected to on the backend.
+  The way it does this, is anytime a open/close/log method is called from RecordingService, it will call each of its custom RecordingHandler objects, then that RecordingHandler object will instantiate or use an existing custom HandlerContext object for each handler that was passed into RecordingService. 
+  Inside the HandlerContext classes they will instantiate or use an existing ObservabilityContext object, and inside that it will instantiate or use an existing OpenTelemetry Context object to perform all the necessary operations based on what family of monitoring is being done, whether traces, metrics, or logs.
+  It might be worth splitting up the RecordingHandler, HandlerContext into MetricHandler, MetricContext, TracesHandler, TracesContext, LogsHandler, LogsContext. Figure that out by testing how well the generic methods work.
+
 
 
 Big benefit of Observability Bridge:
 You can develop observability independently of the backend software
 recordingHandlers are made to handle this part depending on what backend software you are using. For example PrometheusHandler, they are independent of application language.
+
+Next Steps:
+Use test driven development to get SimpleSystemOutHandler, SystemOutHandler, PrometheusHandler, and JaegerAdapater working in that order.
+Adapter is not the right term. Handler is correct, A Handler must have 1 or more contexts in order to work with the ObservabilityContext map. But the context may be a simple singleton that does nothing in some cases, like the case of simpleSystemOutHanlder, and nullHandler
+Adapter translates something from one interface/language to another.
