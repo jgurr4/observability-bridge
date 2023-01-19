@@ -13,7 +13,7 @@ public class SystemOutLogHandler implements RecordingHandler<SystemOutContext> {
   public boolean indent = true;
 
   @Override
-  public SystemOutContext open(SystemOutContext context, String group, IMap<String, String> dimensions) {
+  public SystemOutContext open(SystemOutContext context, String group, String name, IMap<String, String> dimensions) {
     return log(context, group, dimensions, 0);
   }
 

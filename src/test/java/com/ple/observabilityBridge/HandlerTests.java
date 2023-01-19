@@ -8,12 +8,28 @@ import io.prometheus.client.Counter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Assert.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
+import static junit.framework.TestCase.assertEquals;
 //import org.junit.jupiter.api.Test;
 //import static org.junit.jupiter.api.Assertions.*;
 //    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
 //        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
 public class HandlerTests {
+
+  @Test
+  public void simpleSystemOutLogTest() {
+    SimpleSystemOutHandler o = SimpleSystemOutHandler.only;
+    RecordingService rs = RecordingService.make("outHandler", o);
+//    rs.open(ObservabilityContext.empty, "test1", "dim1", "val1", "dim2", "val2");
+    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    rs.log(ObservabilityContext.empty, "test1", "dim1", "val1", "dim2", "val2");
+    assertEquals("hello world", outContent.toString());
+  }
 
   @Test
   public void promLogTest() {

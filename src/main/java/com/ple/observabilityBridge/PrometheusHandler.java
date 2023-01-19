@@ -21,7 +21,7 @@ public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
 
   // Open and close are used for histograms to record latency for buckets. They may also be used to generate generic category for the metrics inside.
   @Override
-  public PrometheusContext open(PrometheusContext context, String group, IMap<String, String> dimensions) {
+  public PrometheusContext open(PrometheusContext context, String group, String name, IMap<String, String> dimensions) {
     return null;
   }
 

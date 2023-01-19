@@ -39,7 +39,8 @@ public class RecordingService {
 
   public ObservabilityContext open(ObservabilityContext contextMap, String group, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers.values()) {
-      final HandlerContext handlerContext = handler.open(contextMap.get(handler), group, dimensions);
+      final String name = "generatedname";
+      final HandlerContext handlerContext = handler.open(contextMap.get(handler), group, name, dimensions);
       contextMap = contextMap.put(handler, handlerContext);
     }
     return contextMap;
@@ -51,7 +52,7 @@ public class RecordingService {
 
   public ObservabilityContext open(ObservabilityContext context, String group, String name, IMap<String, String> dimensions) {
     for (RecordingHandler handler : handlers.values()) {
-      handler.open(context, group, name, dimensions);
+      handler.open(context.get(handler), group, name, dimensions);
     }
     return open(context, group, IArrayMap.empty);
   }

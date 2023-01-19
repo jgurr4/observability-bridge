@@ -5,7 +5,7 @@ package com.ple.observabilityBridge;
  * ObservabilityContext map to work. So to save memory, we just have this one, and we don't
  * need more than one created at a time.
  */
-public class SimpleSystemOutContext {
+public class SimpleSystemOutContext implements HandlerContext {
     static final SimpleSystemOutContext only = new SimpleSystemOutContext();
     private SimpleSystemOutContext(){};
 }

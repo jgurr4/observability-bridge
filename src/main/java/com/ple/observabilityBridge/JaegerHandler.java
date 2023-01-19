@@ -58,7 +58,7 @@ public class JaegerHandler implements RecordingHandler<JaegerContext> {
   }
 
   @Override
-  public JaegerContext open(JaegerContext context, String group, IMap<String, String> dimensions) {
+  public JaegerContext open(JaegerContext context, String group, String name, IMap<String, String> dimensions) {
     Span span = this.tracer.spanBuilder("Start my wonderful use case").setParent(context.get())
         .startSpan();
     span.addEvent("Event 0");
