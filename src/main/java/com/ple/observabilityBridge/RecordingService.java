@@ -87,7 +87,7 @@ public class RecordingService {
   }
 
   public ObservabilityContext log(ObservabilityContext context, String group, String... dimensions) {
-    return log(context, group, 0, IArrayMap.make(Arrays.asList(dimensions)));
+    return log(context, group, 0, IArrayMap.make(dimensions));
   }
 
   public RecordingService clone() {

@@ -22,13 +22,14 @@ public class HandlerTests {
 
   @Test
   public void simpleSystemOutLogTest() {
+    ObservabilityContext ctx = ObservabilityContext.empty;
     SimpleSystemOutHandler o = SimpleSystemOutHandler.only;
     RecordingService rs = RecordingService.make("outHandler", o);
 //    rs.open(ObservabilityContext.empty, "test1", "dim1", "val1", "dim2", "val2");
     ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     System.setOut(new PrintStream(outContent));
-    rs.log(ObservabilityContext.empty, "test1", "dim1", "val1", "dim2", "val2");
-    assertEquals("hello world", outContent.toString());
+    rs.log(ctx.put(o, SimpleSystemOutContext.only), "test1", "dim1", "val1", "dim2", "val2");
+    assertEquals("test1 dim1=val1 dim2=val2\n", outContent.toString());
   }
 
   @Test
