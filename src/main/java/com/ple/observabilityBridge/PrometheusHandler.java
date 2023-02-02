@@ -2,6 +2,7 @@ package com.ple.observabilityBridge;
 
 import com.ple.util.IEntry;
 import com.ple.util.IMap;
+import com.ple.util.Immutable;
 import io.prometheus.client.exporter.HTTPServer;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@Immutable
 public class PrometheusHandler implements RecordingHandler<PrometheusContext> {
   public static PrometheusHandler only = new PrometheusHandler();
   private static Map<String, Counter> counters = new HashMap<>();

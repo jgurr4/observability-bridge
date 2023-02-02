@@ -16,11 +16,9 @@ public class ObservabilityContext {
 
   private ObservabilityContext() { }
 
-/*
   public static ObservabilityContext make() {
-    return null;
+    return new ObservabilityContext();
   }
-*/
 
   HandlerContext get(RecordingHandler handler) {
     return map.get(handler);

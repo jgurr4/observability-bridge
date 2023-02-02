@@ -21,23 +21,27 @@ import static junit.framework.TestCase.assertEquals;
 public class HandlerTests {
 
   @Test
-  public void simpleSystemOutLogTest() {
-    ObservabilityContext ctx = ObservabilityContext.empty;
-    SimpleSystemOutHandler o = SimpleSystemOutHandler.only;
-    RecordingService rs = RecordingService.make("outHandler", o);
-//    rs.open(ObservabilityContext.empty, "test1", "dim1", "val1", "dim2", "val2");
-    ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+  public void simpleSystemOutOpenCloseTest() {
+    final ObservabilityContext ctx = ObservabilityContext.empty;
+    final SimpleSystemOutHandler o = SimpleSystemOutHandler.only;
+    final RecordingService rs = RecordingService.make("outHandler", o);
+    final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     System.setOut(new PrintStream(outContent));
+    rs.open(ctx, "test1", "dim1", "val1", "dim2", "val2");
     rs.log(ctx.put(o, SimpleSystemOutContext.only), "test1", "dim1", "val1", "dim2", "val2");
+    rs.close(ctx, "test1", "dim1", "val1", "dim2", "val2");
     assertEquals("test1 dim1=val1 dim2=val2\n", outContent.toString());
   }
 
   @Test
   public void promLogTest() {
+    final ObservabilityContext ctx = ObservabilityContext.make();
     final PrometheusHandler promHandler = PrometheusHandler.only;
     final RecordingService rs = RecordingService.make("promHandler", promHandler);
-    rs.log(ObservabilityContext.empty, "mysql", "connection", "3", "user", "Mordhau");
-//    rs.log("mysql", "connection", "4", "user", "Benny");
+    rs.open(ctx, "test2", "name", "promLogTest");
+    rs.log(ctx, "mysql", "service", "backup1", "crud_type", "read");
+    rs.log(ctx, "mysql", "service", "backup2", "crud_type", "update");
+    rs.close(ctx, "test2", "name", "promLogTest");
     Assert.assertThrows(IllegalArgumentException.class,
         () -> Counter.build().name("mysql_connection_user_count").labelNames("connection", "user").help("1")
             .register());

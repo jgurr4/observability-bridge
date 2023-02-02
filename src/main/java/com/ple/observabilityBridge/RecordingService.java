@@ -47,7 +47,7 @@ public class RecordingService {
   }
 
   public ObservabilityContext open(ObservabilityContext context, String group, String... dimensions) {
-    return open(context, group, IArrayMap.make(Arrays.asList(dimensions)));
+    return open(context, group, IArrayMap.make(dimensions));
   }
 
   public ObservabilityContext open(ObservabilityContext context, String group, String name, IMap<String, String> dimensions) {
